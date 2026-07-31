@@ -1,321 +1,382 @@
 /*
- * The page is a working drawing.
+ * A dark, measured surface for a tool that deals in tenths of a millimetre.
  *
- * Every value here comes from that idea: a cool paper rather than a warm one,
- * ink rather than black, one structural blue for anything interactive, and the
- * red reserved for a single meaning it already carries in the product, which is
- * the laser cut line. Nothing is coloured for decoration.
+ * Every colour below is stated with its contrast against `--void`, because
+ * this product's whole argument is that its numbers were measured. A palette
+ * that had not been would undercut it. Nothing here is coloured for
+ * decoration: the accent marks what you can act on, the red is the cut line a
+ * laser already understands, and everything else is ink, fog and rule.
  */
 
 :root {
-  --paper: #e9edf1;
-  --paper-raised: #f4f7f9;
-  --ink: #12161b;
-  --ink-soft: #566373;
-  --rule: #b6c1cd;
-  --rule-soft: #d3dbe3;
-  --accent: #2f4bff;
-  --accent-quiet: #dfe4ff;
-  --cut: #e2231a;
+  --void: #07080a;
+  --panel: #0d0f13;
+  --panel-high: #12151a;
 
-  --edge: 2px;
-  --gap: 1.5rem;
-  --measure: 68ch;
+  --fog: #eef1f4; /* 17.9:1  body */
+  --mute: #9aa3ad; /*  8.1:1  secondary copy */
+  --dim: #838d98; /*  6.0:1  small uppercase labels */
+  --edge: #59616b; /*  3.2:1  control boundaries */
+  --line: #1e232a; /*  1.4:1  decorative rules only */
 
-  --sans:
-    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --accent: #8f9bff; /*  8.4:1  anything you can act on */
+  --accent-dim: #4c58c8;
+  --accent-wash: rgba(143, 155, 255, 0.12);
+  --cut: #ff6b5e; /*  7.4:1  the laser cut line, and warnings */
 
-  color-scheme: light dark;
-}
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #0f1318;
-    --paper-raised: #161c23;
-    --ink: #e7edf3;
-    --ink-soft: #93a1b1;
-    --rule: #2c3743;
-    --rule-soft: #202832;
-    --accent: #7f92ff;
-    --accent-quiet: #1b2340;
-  }
+  --shell: 1240px;
+  --rule: 1px solid var(--line);
+
+  color-scheme: dark;
 }
 
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html {
-  -webkit-text-size-adjust: 100%;
+  background: var(--void);
+  /* Nothing here is meant to be reached sideways. `clip` rather than `hidden`,
+     which would turn the html box into a scroll container and break sticky. */
+  overflow-x: clip;
+  scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--sans);
-  font-size: 16px;
-  line-height: 1.55;
-  /* The faintest grid, the way drawing paper has one. */
-  background-image:
-    linear-gradient(var(--rule-soft) 1px, transparent 1px),
-    linear-gradient(90deg, var(--rule-soft) 1px, transparent 1px);
-  background-size: 24px 24px;
-  background-position: -1px -1px;
+  background: var(--void);
+  color: var(--fog);
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 15px;
+  line-height: 1.6;
+  font-feature-settings: "zero" 1;
+  -webkit-font-smoothing: antialiased;
 }
 
-a {
-  color: inherit;
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
+/* A faint stipple, so pure black never reads as an unpainted canvas. */
+.field {
+  background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
+  background-size: 22px 22px;
 }
 
 h1,
 h2,
 h3 {
   margin: 0;
-  font-weight: 620;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  font-family: var(--font-display), var(--font-mono), sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
 }
 
 h1 {
-  font-size: clamp(2rem, 5vw, 3.1rem);
+  font-size: clamp(2.4rem, 5.6vw, 4.4rem);
 }
 
 h2 {
-  font-size: 1.35rem;
+  font-size: clamp(1.6rem, 3.4vw, 2.6rem);
+}
+
+h3 {
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
 }
 
 p {
   margin: 0 0 1rem;
-  max-width: var(--measure);
+  max-width: 62ch;
+  color: var(--mute);
 }
 
-code,
-.num {
-  font-family: var(--mono);
-  font-variant-numeric: tabular-nums;
+a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid var(--edge);
+  padding-bottom: 1px;
+  transition: border-color 0.2s var(--ease-out-soft), color 0.2s var(--ease-out-soft);
+}
+
+a:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+:where(a, button, select, summary, input, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
 }
 
 .shell {
-  max-width: 1180px;
+  width: 100%;
+  max-width: var(--shell);
   margin: 0 auto;
-  padding: 0 clamp(1rem, 4vw, 2.5rem);
+  padding: 0 clamp(1.1rem, 4vw, 2.75rem);
 }
 
-/* The sheet: everything sits on drawn paper with a hard border. */
-.sheet {
-  background: var(--paper-raised);
-  border: var(--edge) solid var(--ink);
-  box-shadow: 6px 6px 0 var(--rule);
+.label {
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--dim);
 }
+
+.num {
+  font-variant-numeric: tabular-nums;
+  color: var(--fog);
+}
+
+/* Masthead ---------------------------------------------------------------- */
 
 .masthead {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem 2rem;
-  align-items: baseline;
-  justify-content: space-between;
-  padding: 1.25rem 0 1rem;
-  border-bottom: var(--edge) solid var(--ink);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: blur(14px);
+  background: color-mix(in srgb, var(--void) 82%, transparent);
+  border-bottom: var(--rule);
 }
 
-.wordmark {
+.masthead > div {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  font-size: 1.15rem;
+  justify-content: space-between;
+  gap: 1.5rem;
+  height: 62px;
 }
 
 .masthead nav {
   display: flex;
-  gap: 1.25rem;
-  font-size: 0.9rem;
-  color: var(--ink-soft);
+  gap: 1.4rem;
+  font-size: 0.8rem;
+  color: var(--mute);
 }
 
-/* Eyebrow labels are set in the same bitmap font that gets printed. */
-.eyebrow {
-  display: block;
-  margin-bottom: 0.6rem;
+.masthead nav a {
+  border: 0;
 }
 
-.hero {
-  display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  gap: clamp(1.5rem, 4vw, 3rem);
-  align-items: start;
-  padding: clamp(2rem, 6vw, 3.5rem) 0 2rem;
-}
-
-@media (max-width: 900px) {
-  .hero {
-    grid-template-columns: minmax(0, 1fr);
+@media (max-width: 620px) {
+  .masthead nav a:not(:last-child) {
+    display: none;
   }
 }
 
-.lede {
-  font-size: 1.05rem;
-  color: var(--ink-soft);
+/* Hero -------------------------------------------------------------------- */
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 3.5rem);
+  padding: clamp(2.5rem, 8vh, 5rem) 0 clamp(2.5rem, 7vh, 4.5rem);
 }
 
-.link-form {
-  display: flex;
-  gap: 0.5rem;
-  margin: 1.5rem 0 0.75rem;
-  flex-wrap: wrap;
+.hero-copy {
+  /* In ch of the mono body font this used to be about 200px wide, which put
+     one word per line at the headline's size. */
+  max-width: min(100%, 44rem);
 }
 
-input[type="text"],
-input[type="url"],
-select {
-  flex: 1 1 16rem;
-  min-width: 0;
-  padding: 0.7rem 0.8rem;
-  border: var(--edge) solid var(--ink);
-  background: var(--paper);
-  color: var(--ink);
-  font: inherit;
-  border-radius: 0;
+.hero h1 span {
+  display: block;
 }
 
-input::placeholder {
-  color: var(--ink-soft);
+.hero-lede {
+  font-size: 0.95rem;
+  max-width: 44ch;
+  margin-top: 1.3rem;
+  margin-bottom: 0;
 }
 
-button {
-  font: inherit;
-  font-weight: 600;
-  padding: 0.7rem 1.1rem;
-  border: var(--edge) solid var(--ink);
-  background: var(--accent);
-  color: #fff;
-  cursor: pointer;
-  border-radius: 0;
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(1.75rem, 4vw, 3.5rem);
+  align-items: center;
 }
 
-button.quiet {
-  background: var(--paper);
-  color: var(--ink);
+@media (max-width: 940px) {
+  .hero-grid {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
 }
 
-button[disabled] {
-  opacity: 0.45;
-  cursor: not-allowed;
+/* Panels ------------------------------------------------------------------ */
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
 }
 
-button:not([disabled]):hover {
-  transform: translate(-1px, -1px);
-  box-shadow: 2px 2px 0 var(--ink);
-}
-
-:focus-visible {
-  outline: 3px solid var(--accent);
-  outline-offset: 2px;
+.panel-pad {
+  padding: clamp(1.1rem, 3vw, 1.9rem);
 }
 
 .stage {
-  padding: clamp(1rem, 3vw, 2rem);
-  display: grid;
-  gap: 1rem;
+  position: relative;
+  overflow: hidden;
 }
 
 .drawing {
+  display: block;
   width: 100%;
   height: auto;
-  display: block;
 }
 
 .readout {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem 1.5rem;
-  font-family: var(--mono);
-  font-size: 0.82rem;
-  color: var(--ink-soft);
-  border-top: 1px solid var(--rule);
-  padding-top: 0.75rem;
+  gap: 0.4rem 1.6rem;
+  font-size: 0.78rem;
+  color: var(--dim);
+  border-top: var(--rule);
+  padding: 0.85rem clamp(1.1rem, 3vw, 1.9rem);
 }
 
-.readout b {
-  color: var(--ink);
-  font-weight: 600;
+/* Controls ---------------------------------------------------------------- */
+
+.form-row {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-top: 1.9rem;
+}
+
+input[type="text"],
+select {
+  flex: 1 1 17rem;
+  min-width: 0;
+  padding: 0.75rem 0.9rem;
+  background: var(--panel-high);
+  border: 1px solid var(--edge);
+  color: var(--fog);
+  font: inherit;
+  font-size: 0.88rem;
+  border-radius: 2px;
+}
+
+input::placeholder {
+  color: var(--dim);
+}
+
+button {
+  font: inherit;
+  font-size: 0.85rem;
+  letter-spacing: 0.01em;
+  padding: 0.75rem 1.15rem;
+  background: var(--accent);
+  color: #05060a;
+  border: 1px solid var(--accent);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.18s var(--ease-out-soft), color 0.18s var(--ease-out-soft);
+}
+
+button:hover:not([disabled]) {
+  background: #b3bcff;
+  border-color: #b3bcff;
+}
+
+button.ghost {
+  background: transparent;
+  color: var(--fog);
+  border-color: var(--edge);
+}
+
+button.ghost:hover:not([disabled]) {
+  background: var(--accent-wash);
+  border-color: var(--accent);
+  color: var(--fog);
+}
+
+button[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .controls {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  gap: 1.25rem 2rem;
-  padding: clamp(1rem, 3vw, 1.75rem);
-  border-top: var(--edge) solid var(--ink);
+  grid-template-columns: repeat(auto-fit, minmax(15.5rem, 1fr));
+  gap: 1.6rem 2.2rem;
 }
 
-.field {
+.field-group {
   display: grid;
-  gap: 0.4rem;
+  gap: 0.55rem;
+  align-content: start;
 }
 
-.field > span {
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
+.hint {
+  font-size: 0.76rem;
+  color: var(--dim);
+  line-height: 1.5;
 }
 
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: 0.35rem;
 }
 
 .chip {
-  padding: 0.35rem 0.6rem;
-  border: 1px solid var(--rule);
-  background: var(--paper);
-  font-size: 0.85rem;
-  cursor: pointer;
-  color: var(--ink);
-  font-weight: 500;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.78rem;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--mute);
+  border-radius: 2px;
+}
+
+.chip:hover:not([disabled]) {
+  background: transparent;
+  border-color: var(--edge);
+  color: var(--fog);
 }
 
 .chip[aria-pressed="true"] {
-  border-color: var(--ink);
-  background: var(--accent-quiet);
-  box-shadow: inset 0 0 0 1px var(--ink);
+  border-color: var(--accent);
+  background: var(--accent-wash);
+  color: var(--fog);
 }
 
 input[type="range"] {
   width: 100%;
   accent-color: var(--accent);
+  background: transparent;
 }
 
 .swatches {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.3rem;
+  gap: 0.28rem;
 }
 
 .swatch {
-  width: 1.6rem;
-  height: 1.6rem;
-  border: 1px solid var(--rule);
-  cursor: pointer;
+  width: 1.45rem;
+  height: 1.45rem;
   padding: 0;
-  background-clip: padding-box;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  transition: transform 0.16s var(--ease-out-strong);
+}
+
+.swatch:hover {
+  transform: translateY(-2px);
 }
 
 .swatch[aria-pressed="true"] {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-wash);
 }
 
 .verdict {
-  font-family: var(--mono);
-  font-size: 0.8rem;
+  font-size: 0.76rem;
+  color: var(--mute);
 }
 
 .verdict[data-verdict="poor"] {
@@ -326,70 +387,143 @@ input[type="range"] {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  align-items: center;
-  padding: clamp(1rem, 3vw, 1.75rem);
-  border-top: var(--edge) solid var(--ink);
+  border-top: var(--rule);
+  padding: clamp(1rem, 3vw, 1.4rem) clamp(1.1rem, 3vw, 1.9rem);
 }
 
 .notes {
   margin: 0;
-  padding: 0 clamp(1rem, 3vw, 1.75rem) 1.25rem;
+  padding: 0 clamp(1.1rem, 3vw, 1.9rem) 1.2rem;
   list-style: none;
-  font-size: 0.85rem;
-  color: var(--ink-soft);
+  font-size: 0.78rem;
+  color: var(--dim);
 }
 
 .notes li::before {
   content: "note ";
-  font-family: var(--mono);
   color: var(--cut);
 }
 
-.columns {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
-  gap: clamp(1.5rem, 4vw, 2.5rem);
-  padding: clamp(2rem, 6vw, 3.5rem) 0;
-  border-top: var(--edge) solid var(--ink);
+.error {
+  border: 1px solid var(--cut);
+  background: rgba(255, 107, 94, 0.08);
+  color: var(--fog);
+  padding: 0.7rem 0.9rem;
+  font-size: 0.82rem;
+  margin-top: 1rem;
 }
 
-.columns h2 {
+/* Sections ---------------------------------------------------------------- */
+
+section {
+  border-top: var(--rule);
+  padding: clamp(4rem, 12vh, 8rem) 0;
+}
+
+.section-head {
+  display: grid;
+  gap: 0.9rem;
+  margin-bottom: clamp(2rem, 5vw, 3.4rem);
+  max-width: 46ch;
+}
+
+.build {
+  position: relative;
+}
+
+.build-track {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(1.5rem, 5vw, 4rem);
+  align-items: start;
+}
+
+@media (max-width: 940px) {
+  .build-track {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.build-sticky {
+  position: sticky;
+  top: 96px;
+}
+
+.build-steps {
+  display: grid;
+  gap: clamp(4rem, 22vh, 12rem);
+  padding: clamp(2rem, 12vh, 8rem) 0;
+}
+
+.build-step h3 {
   margin-bottom: 0.5rem;
 }
 
-.columns p,
-.columns li {
-  font-size: 0.95rem;
-  color: var(--ink-soft);
+.step-index {
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  color: var(--accent);
 }
 
-.columns ul {
+.strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.strip > figure {
   margin: 0;
-  padding-left: 1.1rem;
+  background: var(--panel);
+  padding: 1.4rem 1.2rem 1.1rem;
+  display: grid;
+  gap: 0.9rem;
+  align-content: space-between;
+}
+
+.strip figcaption {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--dim);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 2.2rem;
+}
+
+.fact-number {
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--fog);
 }
 
 footer {
-  border-top: var(--edge) solid var(--ink);
-  padding: 1.5rem 0 3rem;
-  font-size: 0.85rem;
-  color: var(--ink-soft);
+  border-top: var(--rule);
+  padding: 2.5rem 0 4rem;
+  font-size: 0.8rem;
+  color: var(--dim);
 }
 
-.error {
-  border: var(--edge) solid var(--cut);
-  background: var(--paper);
-  color: var(--ink);
-  padding: 0.7rem 0.9rem;
-  font-size: 0.9rem;
+footer p {
+  color: var(--dim);
+  font-size: 0.8rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  * {
-    animation: none !important;
-    transition: none !important;
+  html {
+    scroll-behavior: auto;
   }
 
-  button:not([disabled]):hover {
-    transform: none;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }

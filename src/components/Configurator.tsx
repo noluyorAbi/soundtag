@@ -1,25 +1,28 @@
 /**
  * The whole product, on one screen.
  *
- * The code image is fetched once per link and composed in the browser after
- * that, so moving a slider costs no network and no server time. The download
- * buttons hand the same parameters to the route handler, which rebuilds the
- * tag from the same functions, so what was on screen is what lands in the
- * slicer.
+ * It opens on a real tag rather than an empty box: the example code is
+ * embedded, so the first paint is the object itself and nothing has been
+ * fetched yet. Pasting a link replaces it. After that the code image is
+ * fetched once and every preview is composed in the browser, so moving a
+ * slider costs no network and no server time.
+ *
+ * The download buttons hand the same parameters to the route handler, which
+ * rebuilds the tag from the same functions, so what was on screen is what
+ * lands in the slicer.
  */
 
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
 
+import { DEMO_SCANNABLE, DEMO_TRACK } from "@/lib/demo";
 import { FILAMENTS, changePlan, pairing } from "@/lib/filament";
 import { SHAPES, layout, type ShapeName } from "@/lib/layouts";
 import { parseRef, type Scannable } from "@/lib/scannable";
 import { composeTag, type TagOptions } from "@/lib/tag";
-import { PixelText } from "./PixelText";
 import { TagDrawing } from "./TagDrawing";
-
-const SUGGESTION = "https://open.spotify.com/track/2QjOHCTQ1Jl3zawyYOpxh6";
 
 type Settings = {
   shape: ShapeName;
@@ -47,11 +50,13 @@ const START: Settings = {
   code: "#ffffff",
 };
 
-export function Configurator() {
+export function Configurator({ intro }: { intro?: React.ReactNode }) {
+  const reduced = useReducedMotion();
   const [link, setLink] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [scannable, setScannable] = useState<Scannable | null>(null);
+  const [scannable, setScannable] = useState<Scannable>(DEMO_SCANNABLE);
+  const [isDemo, setIsDemo] = useState(true);
   const [settings, setSettings] = useState<Settings>(START);
 
   const set = useCallback(<K extends keyof Settings>(key: K, value: Settings[K]) => {
@@ -67,12 +72,12 @@ export function Configurator() {
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error ?? "could not read that code");
       setScannable(payload.scannable as Scannable);
+      setIsDemo(false);
       if (shared) {
         setLink(raw);
         setSettings((current) => fromParams(shared, current));
       }
     } catch (cause) {
-      setScannable(null);
       setError(cause instanceof Error ? cause.message : String(cause));
     } finally {
       setPending(false);
@@ -104,7 +109,6 @@ export function Configurator() {
   );
 
   const composed = useMemo(() => {
-    if (!scannable) return null;
     try {
       return { geometry: composeTag(scannable, options), failure: null as string | null };
     } catch (cause) {
@@ -112,17 +116,15 @@ export function Configurator() {
     }
   }, [scannable, options]);
 
-  const shapeDefaults = layout(settings.shape);
+  const geometry = composed.geometry;
+  const preset = layout(settings.shape);
   const pair = pairing(settings.body, settings.code);
-  const geometry = composed?.geometry ?? null;
   const change = geometry ? changePlan(geometry.changeZ, settings.layerHeightMm) : null;
-  const grams = geometry
-    ? ((areaOf(geometry) / 1000) * 1.24).toFixed(1)
-    : null;
+  const grams = geometry ? ((volumeOf(geometry) / 1000) * 1.24).toFixed(1) : null;
 
   const query = useMemo(() => {
     const params = new URLSearchParams();
-    if (link) params.set("link", link.trim());
+    params.set("link", (link || DEMO_TRACK.link).trim());
     params.set("shape", settings.shape);
     params.set("width", String(settings.widthMm));
     params.set("thickness", String(settings.thicknessMm));
@@ -138,19 +140,11 @@ export function Configurator() {
 
   return (
     <>
-      <div className="hero">
-        <div>
-          <PixelText size={3} className="eyebrow">
-            paste a song
-          </PixelText>
-          <h1>Your song, as a thing you can hold.</h1>
-          <p className="lede">
-            Paste a Spotify link. Get a 3MF with the filament change already assigned, an STL, and an
-            SVG for a laser cutter. Nothing is uploaded, nothing is stored, and there is no account.
-          </p>
-
+      <div className="hero-grid">
+        <div className="hero-copy">
+          {intro}
           <form
-            className="link-form"
+            className="form-row"
             onSubmit={(event) => {
               event.preventDefault();
               void load(link);
@@ -169,66 +163,56 @@ export function Configurator() {
             </button>
           </form>
 
-          {!scannable && !error ? (
-            <p style={{ fontSize: "0.9rem" }}>
-              No link handy?{" "}
-              <button
-                type="button"
-                className="quiet"
-                style={{ padding: "0.15rem 0.4rem", fontSize: "0.85rem" }}
-                onClick={() => {
-                  setLink(SUGGESTION);
-                  void load(SUGGESTION);
-                }}
-              >
-                Use an example
-              </button>
-            </p>
-          ) : null}
+          <p className="hint" style={{ marginTop: "0.9rem" }}>
+            {isDemo
+              ? `Showing ${DEMO_TRACK.title} by ${DEMO_TRACK.artist}. Paste a link to replace it.`
+              : "Your code is loaded. Everything below updates in the browser."}
+          </p>
 
           {error ? <p className="error">{error}</p> : null}
-          {composed?.failure ? <p className="error">{composed.failure}</p> : null}
+          {composed.failure ? <p className="error">{composed.failure}</p> : null}
         </div>
 
-        <div className="sheet stage">
-          {geometry ? (
-            <TagDrawing
-              geometry={geometry}
-              bodyColour={settings.body}
-              codeColour={settings.code}
-              changeZ={geometry.changeZ}
-              thickness={geometry.thickness}
-            />
-          ) : (
-            <p style={{ color: "var(--ink-soft)", margin: 0 }}>
-              The drawing appears here, at the size it will print.
-            </p>
-          )}
-
+        <motion.div
+          className="panel stage field"
+          initial={reduced ? false : { opacity: 0, y: 22 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1], delay: 0.12 }}
+        >
+          <div className="panel-pad">
+            {geometry ? (
+              <TagDrawing
+                geometry={geometry}
+                bodyColour={settings.body}
+                codeColour={settings.code}
+              />
+            ) : null}
+          </div>
           {geometry ? (
             <div className="readout">
               <span>
-                <b>{round(geometry.layout.size.width)}</b> by{" "}
-                <b>{round(geometry.layout.size.height)}</b> by <b>{round(geometry.thickness)}</b> mm
+                <span className="num">{round(geometry.layout.size.width)}</span> by{" "}
+                <span className="num">{round(geometry.layout.size.height)}</span> by{" "}
+                <span className="num">{round(geometry.thickness)}</span> mm
               </span>
               <span>
-                code <b>{round(geometry.code2d.width)}</b> mm wide
+                code <span className="num">{round(geometry.code2d.width)}</span> mm
               </span>
               <span>
-                change at layer <b>{change?.layer}</b>
+                change at layer <span className="num">{change?.layer}</span>
               </span>
               <span>
-                about <b>{grams}</b> g PLA
+                <span className="num">{grams}</span> g PLA
               </span>
             </div>
           ) : null}
-        </div>
+        </motion.div>
       </div>
 
-      <div className="sheet">
-        <div className="controls">
-          <label className="field">
-            <span>Shape</span>
+      <div className="panel" style={{ marginTop: "clamp(1.5rem, 4vw, 2.5rem)" }}>
+        <div className="controls panel-pad">
+          <div className="field-group">
+            <span className="label">Shape</span>
             <div className="chips">
               {SHAPES.map((name) => (
                 <button
@@ -250,11 +234,11 @@ export function Configurator() {
                 </button>
               ))}
             </div>
-            <span style={{ textTransform: "none", letterSpacing: 0 }}>{shapeDefaults.about}</span>
-          </label>
+            <span className="hint">{preset.about}</span>
+          </div>
 
-          <label className="field">
-            <span>
+          <label className="field-group">
+            <span className="label">
               Size <span className="num">{round(settings.widthMm)} mm</span>
             </span>
             <input
@@ -265,15 +249,15 @@ export function Configurator() {
               value={settings.widthMm}
               onChange={(event) => set("widthMm", Number(event.target.value))}
             />
-            <span style={{ textTransform: "none", letterSpacing: 0 }}>
-              Wider bars survive a 0.4 mm nozzle better. The drawing turns red when they will not.
+            <span className="hint">
+              Wider bars survive a 0.4 mm nozzle better. Below about 0.85 mm the drawing says so.
             </span>
           </label>
 
-          <label className="field">
-            <span>
-              Thickness <span className="num">{round(settings.thicknessMm)} mm</span>, relief{" "}
-              <span className="num">{round(settings.reliefMm)} mm</span>
+          <label className="field-group">
+            <span className="label">
+              Thickness <span className="num">{round(settings.thicknessMm)}</span> mm, relief{" "}
+              <span className="num">{round(settings.reliefMm)}</span> mm
             </span>
             <input
               type="range"
@@ -293,8 +277,8 @@ export function Configurator() {
             />
           </label>
 
-          <label className="field">
-            <span>Layer height</span>
+          <label className="field-group">
+            <span className="label">Layer height</span>
             <select
               value={settings.layerHeightMm}
               onChange={(event) => set("layerHeightMm", Number(event.target.value))}
@@ -305,13 +289,11 @@ export function Configurator() {
                 </option>
               ))}
             </select>
-            <span style={{ textTransform: "none", letterSpacing: 0 }}>
-              {change ? change.instruction : "Read a code first."}
-            </span>
+            <span className="hint">{change?.instruction}</span>
           </label>
 
-          <div className="field">
-            <span>Filament</span>
+          <div className="field-group">
+            <span className="label">Filament, body then code</span>
             <div className="swatches">
               {FILAMENTS.map((filament) => (
                 <button
@@ -341,13 +323,15 @@ export function Configurator() {
               ))}
             </div>
             <span className="verdict" data-verdict={pair.verdict}>
-              contrast {pair.ratio.toFixed(1)} to 1, {pair.verdict}
-              {pair.verdict === "poor" ? ". A camera will not separate the bars from the plate." : ""}
+              contrast <span className="num">{pair.ratio.toFixed(1)}</span> to 1, {pair.verdict}
+              {pair.verdict === "poor"
+                ? ". A camera will not separate the bars from the plate."
+                : ""}
             </span>
           </div>
 
-          <label className="field">
-            <span>Text</span>
+          <div className="field-group">
+            <span className="label">Text</span>
             <input
               type="text"
               value={settings.title}
@@ -362,10 +346,13 @@ export function Configurator() {
               placeholder="Artist"
               maxLength={48}
             />
-          </label>
+            <span className="hint">
+              Raised, in the code&apos;s filament. The tag grows to fit it.
+            </span>
+          </div>
 
-          <label className="field">
-            <span>Spotify mark</span>
+          <div className="field-group">
+            <span className="label">Spotify mark</span>
             <div className="chips">
               <button
                 type="button"
@@ -384,30 +371,37 @@ export function Configurator() {
                 include the mark
               </button>
             </div>
-            <span style={{ textTransform: "none", letterSpacing: 0 }}>
-              Off by default. Spotify&apos;s guidelines forbid adding depth to the logo, and the bars
-              are what a scanner reads.
+            <span className="hint">
+              Off by default. Spotify&apos;s guidelines forbid adding depth to the logo, and the
+              bars are what a scanner reads.
             </span>
-          </label>
+          </div>
         </div>
 
         <div className="downloads">
           <button type="button" disabled={!geometry} onClick={() => download("3mf", query)}>
             Download 3MF
           </button>
-          <button type="button" className="quiet" disabled={!geometry} onClick={() => download("stl", query)}>
+          <button
+            type="button"
+            className="ghost"
+            disabled={!geometry}
+            onClick={() => download("stl", query)}
+          >
             STL
           </button>
-          <button type="button" className="quiet" disabled={!geometry} onClick={() => download("svg", query)}>
+          <button
+            type="button"
+            className="ghost"
+            disabled={!geometry}
+            onClick={() => download("svg", query)}
+          >
             Laser SVG
           </button>
           <button
             type="button"
-            className="quiet"
-            disabled={!geometry}
-            onClick={() => {
-              void navigator.clipboard.writeText(`${window.location.origin}/?${query}`);
-            }}
+            className="ghost"
+            onClick={() => void navigator.clipboard.writeText(`${window.location.origin}/?${query}`)}
           >
             Copy a link to this tag
           </button>
@@ -462,10 +456,10 @@ function download(format: string, query: string): void {
   window.location.href = `/api/tag?format=${format}&${query}`;
 }
 
-function areaOf(geometry: ReturnType<typeof composeTag>): number {
-  // Volume without building the mesh: plate area times the body height, plus
-  // the artwork area times the relief.
-  const plate = ringArea(geometry.plate.outer) - geometry.plate.holes.reduce((s, h) => s + ringArea(h), 0);
+/** Volume without building the mesh, so a slider stays instant. */
+function volumeOf(geometry: ReturnType<typeof composeTag>): number {
+  const plate =
+    ringArea(geometry.plate.outer) - geometry.plate.holes.reduce((s, h) => s + ringArea(h), 0);
   const art = [...geometry.code, ...geometry.frontText].reduce(
     (sum, poly) => sum + ringArea(poly.outer) - poly.holes.reduce((s, h) => s + ringArea(h), 0),
     0,

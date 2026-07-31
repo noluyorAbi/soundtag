@@ -12,21 +12,24 @@ const { parseScannable, composeTag, previewSvg } = lib;
 const svg = readFileSync(new URL("../test/fixtures/code-sweater-weather.svg", import.meta.url), "utf8");
 const scannable = parseScannable(svg);
 
+// Dark, to match the site and to sit well in a README on either GitHub theme.
+const STYLE = { bodyColour: "#16181d", codeColour: "#eef1f4" };
+
 const shots = [
-  ["hero", { shape: "bar" }, { bodyColour: "#12161b", codeColour: "#f4f7f9" }],
-  ["bar-text", { shape: "bar", title: "Sweater Weather", artist: "The Neighbourhood" }, {}],
-  ["mark", { shape: "bar", mark: true }, {}],
-  ["coin", { shape: "coin" }, {}],
-  ["card", { shape: "card", title: "Sweater Weather", artist: "The Neighbourhood" }, {}],
-  ["ornament", { shape: "ornament", title: "Sweater Weather" }, {}],
-  ["magnet", { shape: "magnet" }, {}],
+  ["hero", { shape: "bar" }, STYLE],
+  ["bar-text", { shape: "bar", title: "Sweater Weather", artist: "The Neighbourhood" }, STYLE],
+  ["mark", { shape: "bar", mark: true }, STYLE],
+  ["coin", { shape: "coin" }, STYLE],
+  ["card", { shape: "card", title: "Sweater Weather", artist: "The Neighbourhood" }, STYLE],
+  ["ornament", { shape: "ornament", title: "Sweater Weather" }, STYLE],
+  ["magnet", { shape: "magnet" }, STYLE],
 ];
 
 for (const [name, options, style] of shots) {
   const geometry = composeTag(scannable, options);
   writeFileSync(
     new URL(`../assets/${name}.svg`, import.meta.url),
-    previewSvg(geometry, { background: "#e9edf1", pixelsPerMm: 10, ...style }),
+    previewSvg(geometry, { background: "#0d0f13", pixelsPerMm: 10, ...style }),
   );
   console.log(`assets/${name}.svg  ${geometry.layout.size.width} by ${geometry.layout.size.height.toFixed(1)} mm`);
 }

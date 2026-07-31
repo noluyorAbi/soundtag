@@ -48,7 +48,7 @@ Or use the site, which does the same thing with a drawing next to it.
 | `ornament` | 70 mm | Hangs on a tree or a mirror |
 | `magnet` | 75.6 by 16.2 mm | Two 6 by 2 mm magnet seats in the back, no keyring hole |
 
-<img src="assets/card.svg" alt="The card shape with a title and an artist under the code" width="49%"> <img src="assets/coin.svg" alt="The coin shape" width="24%">
+<img src="assets/card.svg" alt="The card shape with a title and an artist under the code" width="52%"> <img src="assets/coin.svg" alt="The coin shape" width="26%">
 
 Adding text grows the tag rather than shrinking the code, because the code is the point of the object.
 
@@ -135,7 +135,7 @@ Documented decisions, so they are not rediscovered as bugs.
 
 ## How it is built
 
-Five runtime dependencies: `next`, `react`, `react-dom`, `server-only`. No geometry library, no ZIP library, no 3MF library, no CSS framework. The ear clipper, the ZIP writer, the 3MF writer, the STL writer, the SVG path reader and the 5 by 7 font are all in `src/lib`, each with the reason it is there written at the top of the file.
+Five runtime dependencies: `next`, `react`, `react-dom`, `server-only` and `motion`. No geometry library, no ZIP library, no 3MF library, no CSS framework. The ear clipper, the ZIP writer, the 3MF writer, the STL writer, the SVG path reader and the 5 by 7 font are all in `src/lib`, each with the reason it is there written at the top of the file.
 
 ```
 src/lib/scannable.ts      reads Spotify's code image, strictly
