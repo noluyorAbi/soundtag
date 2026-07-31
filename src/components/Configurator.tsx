@@ -427,13 +427,18 @@ export function Configurator() {
 
 /** A shared link's query, applied on top of whatever is already set. */
 function fromParams(params: URLSearchParams, current: Settings): Settings {
+  const shape = (SHAPES as string[]).includes(params.get("shape") ?? "")
+    ? (params.get("shape") as ShapeName)
+    : current.shape;
+  // A shared link that names a shape but no size means the shape's own size,
+  // not whatever the previous shape happened to be.
+  const preset = layout(shape);
+
   return {
     ...current,
-    shape: (SHAPES as string[]).includes(params.get("shape") ?? "")
-      ? (params.get("shape") as ShapeName)
-      : current.shape,
-    widthMm: numberOr(params.get("width"), current.widthMm),
-    thicknessMm: numberOr(params.get("thickness"), current.thicknessMm),
+    shape,
+    widthMm: numberOr(params.get("width"), preset.size.width),
+    thicknessMm: numberOr(params.get("thickness"), preset.thickness),
     reliefMm: numberOr(params.get("relief"), current.reliefMm),
     layerHeightMm: numberOr(params.get("layer"), current.layerHeightMm),
     mark: params.get("mark") === "1",
