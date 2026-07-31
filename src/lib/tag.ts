@@ -13,7 +13,7 @@
  */
 
 import { extrude, extrudeWithPockets } from "./geom/extrude";
-import { meshFrom, type Mesh } from "./geom/mesh";
+import { concatMeshes, type Mesh } from "./geom/mesh";
 import {
   capsule,
   polygon,
@@ -260,7 +260,7 @@ export function buildTag(scannable: Scannable, options: TagOptions = {}): Tag {
   const { plate, code, frontText, pockets, changeZ, thickness } = geometry;
 
   const body = extrudeWithPockets(plate, 0, changeZ, pockets);
-  const codeMesh = meshFrom([...code, ...frontText].map((p) => extrude(p, changeZ, thickness)));
+  const codeMesh = concatMeshes([...code, ...frontText].map((p) => extrude(p, changeZ, thickness)));
 
   // The property the whole design rests on, checked rather than assumed.
   assertBand(body, 0, changeZ, "body");

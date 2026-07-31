@@ -30,7 +30,35 @@ const key = (x: number, y: number): Key => `${x},${y}`;
  * clockwise without a second pass to work out which is which.
  */
 export function gridToPolygons(grid: Grid, pixel: number, originX = 0, originY = 0): Polygon[] {
-  const solid = weldDiagonals(grid);
+  // Doubling the grid before welding is what makes both fixes possible at
+  // once. At the font's own resolution, welding a diagonal contact between a
+  // letter's outline and its counter fills the counter and the letter turns
+  // into a blob. At double resolution the same weld closes the contact and
+  // leaves the counter open, so an "a" keeps its hole and no two rings touch.
+  let solid = weldDiagonals(upscale(grid));
+  const step = pixel / 2;
+
+  // Two rings that meet at a single point put four wall quads on one vertical
+  // edge, which is what a slicer means by "non manifold". Welding catches the
+  // ordinary case; this catches the rest by filling the offending corner and
+  // tracing again. It terminates because every pass adds material.
+  let rings: Ring[] = [];
+  for (let attempt = 0; ; attempt++) {
+    rings = trace(solid);
+    const corner = sharedCorner(rings);
+    if (!corner || attempt >= 12) break;
+    solid = fillCorner(solid, corner);
+  }
+
+  return assemble(
+    rings.map((ring) =>
+      collapse(ring).map(([x, y]) => [originX + x * step, originY + y * step] as Vec2),
+    ),
+  );
+}
+
+/** Walks the boundary of every filled region, material on the left. */
+function trace(solid: Grid): Ring[] {
   const filled = (x: number, y: number): boolean =>
     y >= 0 && y < solid.height && x >= 0 && x < solid.width && solid.cells[y][x];
 
@@ -64,9 +92,6 @@ export function gridToPolygons(grid: Grid, pixel: number, originX = 0, originY =
       const options = edges.get(key(current[0], current[1]));
       if (!options || options.length === 0) break;
 
-      // At a point where two regions touch corner to corner there are two ways
-      // out. Taking the sharpest right turn keeps the loop from crossing
-      // itself, which is the standard rule for this kind of trace.
       let chosen = 0;
       if (options.length > 1) {
         chosen = options
@@ -84,22 +109,18 @@ export function gridToPolygons(grid: Grid, pixel: number, originX = 0, originY =
     }
 
     for (const loop of splitPinches(ring)) {
-      if (loop.length < 4) continue;
-      rings.push(collapse(loop).map(([x, y]) => [originX + x * pixel, originY + y * pixel] as Vec2));
+      if (loop.length >= 4) rings.push(loop);
     }
   }
 
-  return assemble(rings);
+  return rings;
 }
 
 /**
- * A stroke one pixel wide meets its neighbour at a single point, and the trace
- * walks through that point twice. The result is one ring that touches itself,
- * which triangulates into caps whose boundary no longer matches the walls
- * built from the same ring, and the mesh opens. Splitting the walk at every
- * repeated vertex turns it back into simple rings.
- *
- * The letter "w" in the bundled font is the case that found this.
+ * A stroke one pixel wide can still meet its neighbour at a single point, and
+ * the walk then passes through that point twice. Splitting at every repeated
+ * vertex turns one self touching loop back into simple rings; the corner fill
+ * above then removes the contact itself.
  */
 function splitPinches(ring: Ring): Ring[] {
   const loops: Ring[] = [];
@@ -122,6 +143,55 @@ function splitPinches(ring: Ring): Ring[] {
 
   if (stack.length >= 4) loops.push(stack);
   return loops;
+}
+
+/** A grid corner that more than one ring passes through, if there is one. */
+function sharedCorner(rings: readonly Ring[]): Vec2 | null {
+  const seen = new Map<Key, number>();
+  for (const ring of rings) {
+    const own = new Set<Key>();
+    for (const [x, y] of ring) own.add(key(x, y));
+    for (const k of own) {
+      const count = (seen.get(k) ?? 0) + 1;
+      if (count > 1) return k.split(",").map(Number) as [number, number];
+      seen.set(k, count);
+    }
+  }
+  return null;
+}
+
+/**
+ * Fills every empty cell touching a corner where two rings meet.
+ *
+ * Filling one of them is enough in most cases and leaves the letter closer to
+ * the drawn shape, but it does not always break the contact, and a loop that
+ * sometimes fails to converge is worse than a joint that is half a font pixel
+ * thicker than it was designed to be.
+ */
+function fillCorner(solid: Grid, [x, y]: Vec2): Grid {
+  const cells = solid.cells.map((row) => [...row]);
+  for (const [cx, cy] of [
+    [x - 1, y - 1],
+    [x, y - 1],
+    [x - 1, y],
+    [x, y],
+  ] as Vec2[]) {
+    if (cy >= 0 && cy < solid.height && cx >= 0 && cx < solid.width) cells[cy][cx] = true;
+  }
+  return { cells, width: solid.width, height: solid.height };
+}
+
+/** Every cell becomes four, so a weld has somewhere to go. */
+function upscale(grid: Grid): Grid {
+  const cells: boolean[][] = [];
+  for (let y = 0; y < grid.height; y++) {
+    const row: boolean[] = [];
+    for (let x = 0; x < grid.width; x++) {
+      row.push(grid.cells[y][x], grid.cells[y][x]);
+    }
+    cells.push(row, [...row]);
+  }
+  return { cells, width: grid.width * 2, height: grid.height * 2 };
 }
 
 /**

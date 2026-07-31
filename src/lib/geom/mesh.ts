@@ -89,6 +89,26 @@ function quant(n: number): number {
   return Math.round(n / WELD);
 }
 
+/**
+ * Appends meshes without welding them.
+ *
+ * Welding is right when two surfaces meet and wrong when they do not. The
+ * twenty three bars of a code never touch, and welding them would merge the
+ * duplicate vertices a triangulator leaves on either side of a bridge, which
+ * turns a manifold letter into a seam belonging to four triangles.
+ */
+export function concatMeshes(meshes: readonly Mesh[]): Mesh {
+  const positions: number[] = [];
+  const triangles: number[] = [];
+  for (const mesh of meshes) {
+    const offset = positions.length / 3;
+    positions.push(...mesh.positions);
+    for (const index of mesh.triangles) triangles.push(index + offset);
+  }
+  return { positions, triangles };
+}
+
+/** Merges meshes and welds coincident vertices. For surfaces that do meet. */
 export function meshFrom(meshes: readonly Mesh[]): Mesh {
   const b = new MeshBuilder();
   for (const m of meshes) {
@@ -162,6 +182,38 @@ export function openEdges(mesh: Mesh): { from: number; to: number }[] {
     const [from, to] = k.split(":").map(Number);
     return { from, to };
   });
+}
+
+/**
+ * Edges that do not belong to exactly two triangles once coincident vertices
+ * are merged by position.
+ *
+ * `isClosed` compares vertex indices, which is what the builder controls.
+ * A slicer merges by position instead, and by that measure a surface can be
+ * closed and still be wrong: two walls standing on the same line, or four
+ * triangles meeting along one edge. Bambu Studio calls that `manifold = no`.
+ * This is the same check, so the answer arrives from `npm test` rather than
+ * from a slicer on one person's laptop.
+ */
+export function nonManifoldEdges(mesh: Mesh): string[] {
+  const at = (index: number): string => {
+    const i = index * 3;
+    return `${round(mesh.positions[i])},${round(mesh.positions[i + 1])},${round(mesh.positions[i + 2])}`;
+  };
+
+  const counts = new Map<string, number>();
+  for (let i = 0; i < mesh.triangles.length; i += 3) {
+    const corners = [at(mesh.triangles[i]), at(mesh.triangles[i + 1]), at(mesh.triangles[i + 2])];
+    for (let k = 0; k < 3; k++) {
+      const edge = [corners[k], corners[(k + 1) % 3]].sort().join("|");
+      counts.set(edge, (counts.get(edge) ?? 0) + 1);
+    }
+  }
+  return [...counts.entries()].filter(([, n]) => n !== 2).map(([edge]) => edge);
+}
+
+function round(n: number): string {
+  return n.toFixed(4);
 }
 
 /** Signed volume via the divergence theorem. Negative means inverted normals. */

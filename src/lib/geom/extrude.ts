@@ -37,9 +37,10 @@ export function extrude(poly: Polygon, z0: number, z1: number): Mesh {
     const [bx, by] = point(b);
     const [cx, cy] = point(c);
     const twiceArea = (bx - ax) * (cy - ay) - (cx - ax) * (by - ay);
-    if (Math.abs(twiceArea) < DEGENERATE) continue;
-    // Counter-clockwise in the xy plane means the face points at +z.
-    faces.push(twiceArea > 0 ? [a, b, c] : [a, c, b]);
+    // A sliver with no area still carries edges, and dropping it here would
+    // turn two interior edges into boundary edges, which then grow walls in
+    // the middle of the cap. It is kept, wound the same way as its neighbour.
+    faces.push(twiceArea >= 0 ? [a, b, c] : [a, c, b]);
   }
 
   const b = new MeshBuilder();

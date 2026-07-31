@@ -67,7 +67,9 @@ export { LIMITS, parseRequest, toSearchParams, type TagRequest } from "./lib/req
 
 export {
   bounds,
+  concatMeshes,
   isClosed,
+  nonManifoldEdges,
   openEdges,
   surfaceArea,
   triangleCount,

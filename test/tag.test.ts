@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "vitest";
 
-import { isClosed, openEdges, volume } from "@/lib/geom/mesh";
+import { isClosed, nonManifoldEdges, openEdges, volume } from "@/lib/geom/mesh";
 import { polygonArea } from "@/lib/geom/polygon";
 import { SHAPES, layout } from "@/lib/layouts";
 import { parseScannable } from "@/lib/scannable";
@@ -18,6 +18,25 @@ test("every shape builds two closed parts", () => {
     for (const part of tag.parts) {
       assert.deepEqual(openEdges(part.mesh), [], `${shape} ${part.name} has open edges`);
       assert.ok(volume(part.mesh) > 0, `${shape} ${part.name} has inverted normals`);
+    }
+  }
+});
+
+test("every shape is manifold by the measure a slicer uses, text and mark included", () => {
+  // Bambu Studio reported this before the test did, three times: stacked slabs
+  // sharing a face, engraved letters bridging to their counters, and a zero
+  // area sliver dropped from a cap so its neighbours grew walls. The check is
+  // in the suite now, so a slicer is confirmation rather than discovery.
+  for (const shape of SHAPES) {
+    for (const options of [{}, { title: "Sweater Weather" }, { title: "Sweater Weather", artist: "The Neighbourhood" }, { mark: true }]) {
+      const tag = buildTag(scannable, { shape, ...options });
+      for (const part of tag.parts) {
+        assert.deepEqual(
+          nonManifoldEdges(part.mesh),
+          [],
+          `${shape} ${part.name} with ${JSON.stringify(options)}`,
+        );
+      }
     }
   }
 });
