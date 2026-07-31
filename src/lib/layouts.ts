@@ -40,8 +40,8 @@ export type LayoutOptions = {
   widthMm?: number;
   holeDiameterMm?: number;
   thicknessMm?: number;
-  /** Reserve room for text. Ignored by shapes that have none. */
-  text?: boolean;
+  /** How many lines of text to reserve room for. */
+  textLines?: number;
 };
 
 const KEYRING_HOLE = 3.6;
@@ -77,29 +77,31 @@ function bar(o: LayoutOptions): Layout {
   const codeLeft = holeCx + holeR + 1.6;
   const codeRight = width - 2.4;
 
-  // With text, the code gives up its lower third and the line sits under it.
-  // Engraving the back was tried first and refused: a letter's counter has to
-  // stay standing inside the recess, and the bridges that a triangulator adds
-  // to reach it land on the outline, which is how a manifold solid stops being
-  // one. Raised text in the code's own filament costs nothing extra to print.
-  const textHeight = o.text ? height * 0.2 : 0;
-  const codeHeight = height * 0.64 - textHeight;
+  // Text does not take height from the code, it adds height to the tag. The
+  // code is the point of the object, and a code that shrank every time someone
+  // typed a title would be the wrong trade.
+  //
+  // Engraving the back was built first and refused: a letter's counter has to
+  // stay standing inside the recess, and the bridges a triangulator adds to
+  // reach it land on the outline, which is how a manifold solid stops being
+  // one. Raised text in the code's filament costs nothing extra to print.
+  const lines = o.textLines ?? 0;
+  const band = lines > 0 ? 2 + lines * 2.9 : 0;
+  const total = height + band;
 
   return {
     name: "bar",
-    outline: roundedRect(width, height, radius),
-    holes: [circle(holeCx, height / 2, holeR)],
+    outline: roundedRect(width, total, radius),
+    holes: [circle(holeCx, total / 2, holeR)],
     pockets: [],
     codeBox: {
       x: codeLeft,
-      y: height * 0.18 + textHeight,
+      y: band + height * 0.18,
       width: codeRight - codeLeft,
-      height: codeHeight,
+      height: height * 0.64,
     },
-    textBox: o.text
-      ? { x: codeLeft, y: height * 0.11, width: codeRight - codeLeft, height: textHeight }
-      : null,
-    size: { width, height },
+    textBox: lines > 0 ? { x: codeLeft, y: 1.4, width: codeRight - codeLeft, height: band - 1.4 } : null,
+    size: { width, height: total },
     thickness: o.thicknessMm ?? 3,
     about: "The keyring bar. The original shape, sized to sit flat against a key.",
   };
@@ -122,7 +124,9 @@ function coin(o: LayoutOptions): Layout {
     holes: [circle(r, holeCy, holeR)],
     pockets: [],
     codeBox: { x: r - halfChord, y: r - codeHeight / 2, width: halfChord * 2, height: codeHeight },
-    textBox: o.text ? { x: r - halfChord * 0.8, y: r * 0.42, width: halfChord * 1.6, height: 4 } : null,
+    textBox: (o.textLines ?? 0) > 0
+      ? { x: r - halfChord * 0.8, y: r * 0.36, width: halfChord * 1.6, height: 3 + (o.textLines ?? 1) * 3 }
+      : null,
     size: { width: d, height: d },
     thickness: o.thicknessMm ?? 3,
     about: "A round tag, code across the middle, hole at twelve o'clock.",

@@ -110,7 +110,7 @@ export function resolveOptions(options: TagOptions = {}): ResolvedOptions {
     widthMm: options.widthMm,
     holeDiameterMm: options.holeDiameterMm,
     thicknessMm: options.thicknessMm,
-    text: Boolean(options.title || options.artist),
+    textLines: [options.title, options.artist].filter(Boolean).length,
   });
   return {
     shape,
@@ -133,7 +133,7 @@ export function composeTag(scannable: Scannable, options: TagOptions = {}): TagG
     widthMm: resolved.widthMm,
     holeDiameterMm: resolved.holeDiameterMm,
     thicknessMm: resolved.thicknessMm,
-    text: Boolean(resolved.title || resolved.artist),
+    textLines: [resolved.title, resolved.artist].filter(Boolean).length,
   });
 
   // The artwork's own bounding box, in source units with y up.

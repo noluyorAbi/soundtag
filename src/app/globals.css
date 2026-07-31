@@ -1,0 +1,395 @@
+/*
+ * The page is a working drawing.
+ *
+ * Every value here comes from that idea: a cool paper rather than a warm one,
+ * ink rather than black, one structural blue for anything interactive, and the
+ * red reserved for a single meaning it already carries in the product, which is
+ * the laser cut line. Nothing is coloured for decoration.
+ */
+
+:root {
+  --paper: #e9edf1;
+  --paper-raised: #f4f7f9;
+  --ink: #12161b;
+  --ink-soft: #566373;
+  --rule: #b6c1cd;
+  --rule-soft: #d3dbe3;
+  --accent: #2f4bff;
+  --accent-quiet: #dfe4ff;
+  --cut: #e2231a;
+
+  --edge: 2px;
+  --gap: 1.5rem;
+  --measure: 68ch;
+
+  --sans:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0f1318;
+    --paper-raised: #161c23;
+    --ink: #e7edf3;
+    --ink-soft: #93a1b1;
+    --rule: #2c3743;
+    --rule-soft: #202832;
+    --accent: #7f92ff;
+    --accent-quiet: #1b2340;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.55;
+  /* The faintest grid, the way drawing paper has one. */
+  background-image:
+    linear-gradient(var(--rule-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--rule-soft) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: -1px -1px;
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 620;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3.1rem);
+}
+
+h2 {
+  font-size: 1.35rem;
+}
+
+p {
+  margin: 0 0 1rem;
+  max-width: var(--measure);
+}
+
+code,
+.num {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 4vw, 2.5rem);
+}
+
+/* The sheet: everything sits on drawn paper with a hard border. */
+.sheet {
+  background: var(--paper-raised);
+  border: var(--edge) solid var(--ink);
+  box-shadow: 6px 6px 0 var(--rule);
+}
+
+.masthead {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 1.25rem 0 1rem;
+  border-bottom: var(--edge) solid var(--ink);
+}
+
+.wordmark {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-size: 1.15rem;
+}
+
+.masthead nav {
+  display: flex;
+  gap: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+/* Eyebrow labels are set in the same bitmap font that gets printed. */
+.eyebrow {
+  display: block;
+  margin-bottom: 0.6rem;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: start;
+  padding: clamp(2rem, 6vw, 3.5rem) 0 2rem;
+}
+
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.lede {
+  font-size: 1.05rem;
+  color: var(--ink-soft);
+}
+
+.link-form {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1.5rem 0 0.75rem;
+  flex-wrap: wrap;
+}
+
+input[type="text"],
+input[type="url"],
+select {
+  flex: 1 1 16rem;
+  min-width: 0;
+  padding: 0.7rem 0.8rem;
+  border: var(--edge) solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  border-radius: 0;
+}
+
+input::placeholder {
+  color: var(--ink-soft);
+}
+
+button {
+  font: inherit;
+  font-weight: 600;
+  padding: 0.7rem 1.1rem;
+  border: var(--edge) solid var(--ink);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+button.quiet {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+button[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+button:not([disabled]):hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.stage {
+  padding: clamp(1rem, 3vw, 2rem);
+  display: grid;
+  gap: 1rem;
+}
+
+.drawing {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.5rem;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  border-top: 1px solid var(--rule);
+  padding-top: 0.75rem;
+}
+
+.readout b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1.25rem 2rem;
+  padding: clamp(1rem, 3vw, 1.75rem);
+  border-top: var(--edge) solid var(--ink);
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.field > span {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.chip {
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.chip[aria-pressed="true"] {
+  border-color: var(--ink);
+  background: var(--accent-quiet);
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.swatch {
+  width: 1.6rem;
+  height: 1.6rem;
+  border: 1px solid var(--rule);
+  cursor: pointer;
+  padding: 0;
+  background-clip: padding-box;
+}
+
+.swatch[aria-pressed="true"] {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.verdict {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+}
+
+.verdict[data-verdict="poor"] {
+  color: var(--cut);
+}
+
+.downloads {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  padding: clamp(1rem, 3vw, 1.75rem);
+  border-top: var(--edge) solid var(--ink);
+}
+
+.notes {
+  margin: 0;
+  padding: 0 clamp(1rem, 3vw, 1.75rem) 1.25rem;
+  list-style: none;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+.notes li::before {
+  content: "note ";
+  font-family: var(--mono);
+  color: var(--cut);
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+  padding: clamp(2rem, 6vw, 3.5rem) 0;
+  border-top: var(--edge) solid var(--ink);
+}
+
+.columns h2 {
+  margin-bottom: 0.5rem;
+}
+
+.columns p,
+.columns li {
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+}
+
+.columns ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+footer {
+  border-top: var(--edge) solid var(--ink);
+  padding: 1.5rem 0 3rem;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+.error {
+  border: var(--edge) solid var(--cut);
+  background: var(--paper);
+  color: var(--ink);
+  padding: 0.7rem 0.9rem;
+  font-size: 0.9rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  button:not([disabled]):hover {
+    transform: none;
+  }
+}

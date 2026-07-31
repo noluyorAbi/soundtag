@@ -116,15 +116,23 @@ test("magnet seats remove material, which the volume shows", () => {
   assert.ok(seatVolume > 100 && seatVolume < 150);
 });
 
-test("text on the bar takes a band under the code, in the code's filament", () => {
+test("text on the bar adds a band under the code without shrinking the code", () => {
   const plain = buildTag(scannable, { shape: "bar" });
   const titled = buildTag(scannable, { shape: "bar", title: "Sweater Weather" });
   assert.equal(plain.geometry.frontText.length, 0);
   assert.ok(titled.geometry.frontText.length > 0);
-  // The code gives up height for the text rather than the tag growing.
-  assert.ok(titled.geometry.scale < plain.geometry.scale);
-  assert.equal(titled.size.height, plain.size.height);
+  // The tag grows, the code stays the size it was.
+  assert.ok(titled.size.height > plain.size.height);
+  assert.equal(titled.size.width, plain.size.width);
+  assert.ok(Math.abs(titled.geometry.scale - plain.geometry.scale) < 1e-9);
   assert.ok(titled.parts.every((p) => isClosed(p.mesh)));
+});
+
+test("a second line of text adds a second band, not a smaller font", () => {
+  const one = buildTag(scannable, { shape: "bar", title: "Sweater Weather" });
+  const two = buildTag(scannable, { shape: "bar", title: "Sweater Weather", artist: "The Neighbourhood" });
+  assert.ok(two.size.height > one.size.height);
+  assert.ok(Math.abs(two.geometry.scale - one.geometry.scale) < 1e-9);
 });
 
 test("engraved text was refused, so no shape produces a pocket for it", () => {
