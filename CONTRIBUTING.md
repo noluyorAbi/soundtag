@@ -27,6 +27,12 @@ Any number in the README, in a comment or in a commit message is one that was me
 
 One entry in `src/lib/layouts.ts`, which answers four questions: the outline, the holes, where the code may go and where text may go. Everything else follows from it, including the laser file and the preview. Add the shape to `SHAPES` and the existing tests will cover it.
 
+## Two dependencies that look wrong and are not
+
+`package.json` pins `postcss` and `sharp` through `overrides`. Next ships older versions of both, npm's proposed fix for their advisories is a downgrade to Next 9, and the overrides clear all four advisories with the build and the tests still green.
+
+`@emnapi/core` and `@emnapi/runtime` are dev dependencies that nothing here imports. They are what `@img/sharp-wasm32` needs, and npm running on macOS writes the wasm variant into the lockfile without writing what it depends on. Without them `npm ci` fails on Linux with `Missing: @emnapi/runtime from lock file`, which is a CI failure on the very first step and nowhere near its cause.
+
 ## Commit messages
 
 Type prefix, lowercase after it, and say what was wrong rather than what you touched.
