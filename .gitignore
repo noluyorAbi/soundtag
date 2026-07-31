@@ -19,3 +19,6 @@ dist
 
 # npm pack output
 *.tgz
+
+# private planning layer: the standards brief and the launch plan
+planning/
