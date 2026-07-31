@@ -30,6 +30,18 @@ const config = [
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
     },
   },
+  {
+    // The page is statically prerendered, so the query string exists only in
+    // the browser. Reading it during render would make the first client render
+    // differ from the server's HTML, which is a hydration error, so a shared
+    // configuration can only be applied after mount. That is what an effect is
+    // for, and the rule cannot tell this case from a cascading render.
+    //
+    // Scoped to the one component that reads the URL. Everything else stays
+    // under the rule.
+    files: ["src/components/Configurator.tsx"],
+    rules: { "react-hooks/set-state-in-effect": "off" },
+  },
 ];
 
 export default config;

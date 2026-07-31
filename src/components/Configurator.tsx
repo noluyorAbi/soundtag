@@ -58,7 +58,7 @@ export function Configurator() {
     setSettings((current) => ({ ...current, [key]: value }));
   }, []);
 
-  const load = useCallback(async (raw: string) => {
+  const load = useCallback(async (raw: string, shared?: URLSearchParams) => {
     setError(null);
     setPending(true);
     try {
@@ -67,6 +67,10 @@ export function Configurator() {
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error ?? "could not read that code");
       setScannable(payload.scannable as Scannable);
+      if (shared) {
+        setLink(raw);
+        setSettings((current) => fromParams(shared, current));
+      }
     } catch (cause) {
       setScannable(null);
       setError(cause instanceof Error ? cause.message : String(cause));
@@ -76,29 +80,13 @@ export function Configurator() {
   }, []);
 
   // A shared link carries the whole configuration in its query, and the page
-  // itself is static, so the query is read here rather than on the server.
+  // itself is static, so the query is read here rather than on the server. The
+  // settings are applied by `load` once the code comes back, which keeps this
+  // effect free of synchronous state updates.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const shared = params.get("link");
-    if (!shared) return;
-
-    setLink(shared);
-    setSettings((current) => ({
-      ...current,
-      shape: (SHAPES as string[]).includes(params.get("shape") ?? "")
-        ? (params.get("shape") as ShapeName)
-        : current.shape,
-      widthMm: numberOr(params.get("width"), current.widthMm),
-      thicknessMm: numberOr(params.get("thickness"), current.thicknessMm),
-      reliefMm: numberOr(params.get("relief"), current.reliefMm),
-      layerHeightMm: numberOr(params.get("layer"), current.layerHeightMm),
-      mark: params.get("mark") === "1",
-      title: params.get("title") ?? current.title,
-      artist: params.get("artist") ?? current.artist,
-      body: colourOr(params.get("body"), current.body),
-      code: colourOr(params.get("code"), current.code),
-    }));
-    void load(shared);
+    if (shared) void load(shared, params);
   }, [load]);
 
   const options: TagOptions = useMemo(
@@ -435,6 +423,25 @@ export function Configurator() {
       </div>
     </>
   );
+}
+
+/** A shared link's query, applied on top of whatever is already set. */
+function fromParams(params: URLSearchParams, current: Settings): Settings {
+  return {
+    ...current,
+    shape: (SHAPES as string[]).includes(params.get("shape") ?? "")
+      ? (params.get("shape") as ShapeName)
+      : current.shape,
+    widthMm: numberOr(params.get("width"), current.widthMm),
+    thicknessMm: numberOr(params.get("thickness"), current.thicknessMm),
+    reliefMm: numberOr(params.get("relief"), current.reliefMm),
+    layerHeightMm: numberOr(params.get("layer"), current.layerHeightMm),
+    mark: params.get("mark") === "1",
+    title: params.get("title") ?? current.title,
+    artist: params.get("artist") ?? current.artist,
+    body: colourOr(params.get("body"), current.body),
+    code: colourOr(params.get("code"), current.code),
+  };
 }
 
 function numberOr(raw: string | null, fallback: number): number {
