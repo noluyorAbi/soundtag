@@ -1,0 +1,60 @@
+{
+  "name": "soundtag",
+  "version": "0.1.0",
+  "description": "Turn a song link into a printable keychain tag: a 3MF with the filament change already assigned, an STL, and an SVG for laser. No upload, no signup.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/noluyorAbi/soundtag.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "type": "module",
+  "bin": {
+    "soundtag": "dist/soundtag.mjs"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "lint:prose": "./scripts/no-em-dash.sh",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "verify:print": "./scripts/verify-print.sh",
+    "build:cli": "esbuild src/cli/main.ts --bundle --platform=node --format=esm --target=node20 --outfile=dist/soundtag.mjs --alias:server-only=./src/cli/noop.ts",
+    "build:lib": "esbuild src/index.ts --bundle --platform=neutral --format=esm --target=node20 --outfile=dist/index.mjs && tsc -p tsconfig.types.json",
+    "prepack": "npm run build:cli && npm run build:lib"
+  },
+  "dependencies": {
+    "next": "^16.2.11",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "server-only": "^0.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "^26.1.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "esbuild": "^0.28.1",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.2.11",
+    "tailwindcss": "4.3.3",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10"
+  }
+}

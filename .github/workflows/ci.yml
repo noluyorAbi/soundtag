@@ -1,0 +1,44 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Least privilege by default. Nothing in this workflow writes to the
+# repository, so the token it is handed should not be able to either.
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      # Third-party actions are pinned to a commit sha rather than a tag. A tag
+      # is mutable, so `@v7` means "whatever that owner points it at today", and
+      # a compromised release would run against this repository. The trailing
+      # comment keeps the version readable so a bump is still a normal diff.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          # checkout leaves the job token in .git/config by default, where any
+          # later step, including one inside a dependency, can read it.
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Types
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: Prose
+        # The em-dash ban is a stated house rule. A rule that is not checked is
+        # a rule that drifts, so it is a gate rather than a note.
+        run: npm run lint:prose
+      - name: Tests
+        run: npm test
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://example.com

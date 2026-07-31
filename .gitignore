@@ -1,0 +1,21 @@
+node_modules
+.next
+# Any .env, because cp .env.example .env is the natural setup step and the
+# first line of that template is a client secret.
+.env*
+!.env.example
+.data
+*.stl
+*.3mf
+.DS_Store
+tsconfig.tsbuildinfo
+.vercel
+
+# local agent config
+.claude/
+
+# bundled CLI and library output
+dist
+
+# npm pack output
+*.tgz
