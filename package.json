@@ -61,5 +61,21 @@
   "overrides": {
     "postcss": "^8.5.25",
     "sharp": "^0.35.0"
-  }
+  },
+  "homepage": "https://soundtag-psi.vercel.app",
+  "bugs": {
+    "url": "https://github.com/noluyorAbi/soundtag/issues"
+  },
+  "keywords": [
+    "spotify",
+    "spotify-code",
+    "3d-printing",
+    "3mf",
+    "stl",
+    "svg",
+    "laser-cutting",
+    "keychain",
+    "bambu",
+    "cli"
+  ]
 }
