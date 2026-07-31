@@ -1,4 +1,4 @@
-<img src="assets/hero.svg" alt="A 75.6 by 16.2 mm keyring tag with a Spotify Code raised out of it" width="100%">
+<img src="https://raw.githubusercontent.com/noluyorAbi/soundtag/main/assets/hero.svg" alt="A 75.6 by 16.2 mm keyring tag with a Spotify Code raised out of it" width="100%">
 
 [![ci](https://github.com/noluyorAbi/soundtag/actions/workflows/ci.yml/badge.svg)](https://github.com/noluyorAbi/soundtag/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/soundtag)](https://www.npmjs.com/package/soundtag)
@@ -48,11 +48,11 @@ Or use the site, which does the same thing with a drawing next to it.
 | `ornament` | 70 mm | Hangs on a tree or a mirror |
 | `magnet` | 75.6 by 16.2 mm | Two 6 by 2 mm magnet seats in the back, no keyring hole |
 
-<img src="assets/card.svg" alt="The card shape with a title and an artist under the code" width="52%"> <img src="assets/coin.svg" alt="The coin shape" width="26%">
+<img src="https://raw.githubusercontent.com/noluyorAbi/soundtag/main/assets/card.svg" alt="The card shape with a title and an artist under the code" width="52%"> <img src="https://raw.githubusercontent.com/noluyorAbi/soundtag/main/assets/coin.svg" alt="The coin shape" width="26%">
 
 Adding text grows the tag rather than shrinking the code, because the code is the point of the object.
 
-<img src="assets/bar-text.svg" alt="The bar shape grown to 24 mm to fit two lines of text" width="100%">
+<img src="https://raw.githubusercontent.com/noluyorAbi/soundtag/main/assets/bar-text.svg" alt="The bar shape grown to 24 mm to fit two lines of text" width="100%">
 
 ## Command line
 

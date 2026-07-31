@@ -25,10 +25,36 @@ export const metadata: Metadata = {
   other: { "trademark-notice": PROJECT.disclaimer },
 };
 
+/**
+ * Structured data, so an assistant answering "how do I print a Spotify code"
+ * has something to quote that is not a guess about the page.
+ */
+const JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: PROJECT.name,
+  description: PROJECT.tagline,
+  applicationCategory: "DesignApplication",
+  operatingSystem: "Any",
+  url: PROJECT.repo,
+  license: "https://opensource.org/licenses/MIT",
+  isAccessibleForFree: true,
+  offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
+  author: { "@type": "Person", name: "noluyorAbi", url: "https://github.com/noluyorAbi" },
+  disambiguatingDescription: PROJECT.disclaimer,
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${mono.variable} ${display.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <script
+          type="application/ld+json"
+          // Serialised from a constant in this file, never from user input.
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
+        />
+      </body>
     </html>
   );
 }

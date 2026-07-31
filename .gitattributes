@@ -1,0 +1,9 @@
+# Generated artwork is drawn by scripts/assets.mjs from the product's own
+# renderer. Counting it as source would have GitHub report this as an SVG
+# project, which is not what anyone is looking for here.
+assets/** linguist-generated=true
+test/fixtures/** linguist-vendored=true
+
+* text=auto eol=lf
+*.png binary
+*.mp4 binary

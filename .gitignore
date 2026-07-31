@@ -22,3 +22,6 @@ dist
 
 # private planning layer: the standards brief and the launch plan
 planning/
+
+# launch skill run state
+.launch
