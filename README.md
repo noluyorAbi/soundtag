@@ -6,6 +6,10 @@
 
 **[soundtag-psi.vercel.app](https://soundtag-psi.vercel.app/?utm_source=readme&utm_medium=hero)**
 
+<img src="https://raw.githubusercontent.com/noluyorAbi/soundtag/main/assets/preview.gif" alt="Pasting a Spotify link, turning the tag in 3D, and the filament change landing on one layer" width="100%">
+
+Thirty eight seconds, every frame a real capture: the browser against a local server, the terminal the actual output of the bundled binary. Sound on for the [16:9 cut](https://raw.githubusercontent.com/noluyorAbi/soundtag/main/assets/demo-16x9.mp4).
+
 Turn a song link into a printable keychain tag. You get a 3MF with the filament change already assigned, a binary STL, and an SVG with separate cut and engrave layers for a laser. No upload, no account, no environment variables.
 
 Not affiliated with, endorsed by, or sponsored by Spotify AB. Spotify is a trademark of Spotify AB. Read [TRADEMARKS.md](TRADEMARKS.md) before you sell anything.

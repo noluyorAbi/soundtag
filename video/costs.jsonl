@@ -8,3 +8,4 @@
 {"ts":"2026-08-01T14:09:38.142Z","stage":"assemble","apiUsd":0,"shortFrames":1154,"longFrames":1154}
 {"ts":"2026-08-01T14:10:36.673Z","stage":"finish","apiUsd":0,"outputs":[{"format":"9x16","file":"assets/social-9x16.mp4","mb":3.8},{"format":"1x1","file":"assets/social-1x1.mp4","mb":2.4}]}
 {"ts":"2026-08-01T14:11:36.301Z","stage":"finish","apiUsd":0,"outputs":[{"format":"9x16","file":"assets/social-9x16.mp4","mb":3.8},{"format":"1x1","file":"assets/social-1x1.mp4","mb":2.4},{"format":"16x9","file":"assets/demo-16x9.mp4","mb":4.1}]}
+{"ts":"2026-08-01T14:18:00.396Z","stage":"finish","apiUsd":0,"outputs":[{"format":"9x16","file":"assets/social-9x16.mp4","mb":3.8},{"format":"1x1","file":"assets/social-1x1.mp4","mb":2.4},{"format":"16x9","file":"assets/demo-16x9.mp4","mb":4.1},{"format":"gif","file":"assets/preview.gif","mb":1.7}]}

@@ -14,4 +14,5 @@ First release.
 - Batch packing of several tags onto one plate
 - Filament contrast check and the exact change layer for a given layer height
 - A command line tool and a typed library entry, both from the same functions the site uses
-- 91 tests, no geometry, ZIP, 3MF or CSS dependency
+- A live view of the object, rendered from the same mesh the 3MF carries, written against WebGL rather than through a scene graph library
+- 92 tests, no geometry, ZIP, 3MF or CSS dependency

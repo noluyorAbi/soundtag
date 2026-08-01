@@ -4,7 +4,12 @@
     "voice": "nova",
     "voiceInstructions": "Calm, precise, a maker showing you something they built. Not an advert.",
     "fps": 30,
-    "formats": ["9x16", "1x1", "16x9"],
+    "formats": [
+      "9x16",
+      "1x1",
+      "16x9",
+      "gif"
+    ],
     "holdSeconds": 0.55
   },
   "scenes": [
