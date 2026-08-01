@@ -25,3 +25,7 @@ planning/
 
 # launch skill run state
 .launch
+
+# rendered video, the distribution files in assets/ are what ships
+video/out/
+video/node_modules/

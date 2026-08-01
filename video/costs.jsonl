@@ -1,0 +1,10 @@
+{"ts":"2026-08-01T14:05:00.531Z","stage":"narrate","scene":"hook","model":"gpt-4o-mini-tts","voice":"nova","textChars":88,"textTokensEst":22,"audioSeconds":5.7,"ttsUsdEst":0.00144,"whisper":"mlx_whisper local, $0"}
+{"ts":"2026-08-01T14:05:05.554Z","stage":"narrate","scene":"paste","model":"gpt-4o-mini-tts","voice":"nova","textChars":90,"textTokensEst":23,"audioSeconds":5.1,"ttsUsdEst":0.00129,"whisper":"mlx_whisper local, $0"}
+{"ts":"2026-08-01T14:05:10.832Z","stage":"narrate","scene":"change","model":"gpt-4o-mini-tts","voice":"nova","textChars":124,"textTokensEst":31,"audioSeconds":7.45,"ttsUsdEst":0.00188,"whisper":"mlx_whisper local, $0"}
+{"ts":"2026-08-01T14:05:16.723Z","stage":"narrate","scene":"shapes","model":"gpt-4o-mini-tts","voice":"nova","textChars":98,"textTokensEst":25,"audioSeconds":6.55,"ttsUsdEst":0.00165,"whisper":"mlx_whisper local, $0"}
+{"ts":"2026-08-01T14:05:21.398Z","stage":"narrate","scene":"cli","model":"gpt-4o-mini-tts","voice":"nova","textChars":76,"textTokensEst":19,"audioSeconds":4,"ttsUsdEst":0.00101,"whisper":"mlx_whisper local, $0"}
+{"ts":"2026-08-01T14:05:26.596Z","stage":"narrate","scene":"close","model":"gpt-4o-mini-tts","voice":"nova","textChars":96,"textTokensEst":24,"audioSeconds":6.35,"ttsUsdEst":0.0016,"whisper":"mlx_whisper local, $0"}
+{"ts":"2026-08-01T14:05:34.725Z","stage":"assemble","apiUsd":0,"shortFrames":1154,"longFrames":1154}
+{"ts":"2026-08-01T14:09:38.142Z","stage":"assemble","apiUsd":0,"shortFrames":1154,"longFrames":1154}
+{"ts":"2026-08-01T14:10:36.673Z","stage":"finish","apiUsd":0,"outputs":[{"format":"9x16","file":"assets/social-9x16.mp4","mb":3.8},{"format":"1x1","file":"assets/social-1x1.mp4","mb":2.4}]}
+{"ts":"2026-08-01T14:11:36.301Z","stage":"finish","apiUsd":0,"outputs":[{"format":"9x16","file":"assets/social-9x16.mp4","mb":3.8},{"format":"1x1","file":"assets/social-1x1.mp4","mb":2.4},{"format":"16x9","file":"assets/demo-16x9.mp4","mb":4.1}]}

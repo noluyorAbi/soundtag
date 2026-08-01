@@ -69,7 +69,12 @@ void main() {
   // as relief rather than as a drawing.
   float spec = pow(max(dot(reflect(-key, n), view), 0.0), 24.0) * 0.30;
 
-  vec3 lit = colour * (0.30 + lambert) + vec3(rim + spec);
+  // A small light term that is added rather than multiplied. Black filament
+  // multiplied by any amount of light is still black, and a plate that
+  // disappears into the panel is not what the object looks like in a room.
+  float sheen = 0.05 + 0.09 * max(dot(n, key), 0.0);
+
+  vec3 lit = colour * (0.30 + lambert) + vec3(rim + spec + sheen);
   gl_FragColor = vec4(lit, 1.0);
 }
 `;
@@ -164,13 +169,16 @@ export function LiveTag({
 
       // Clip space runs -1 to 1 on both axes while the canvas is `aspect`
       // times wider, so square pixels need the x scale divided by the aspect.
+      // z is negated because depth testing keeps the smaller value: without
+      // that, the underside of the plate wins against the code standing on top
+      // of it and the tag renders as a blank slab.
       // The uniform part is the largest that still fits the model's own radius
       // in both directions, with a margin the sway never eats into.
-      const fit = (aspect >= 1 ? 1 : aspect) / (radius * 1.18);
+      const fit = (aspect >= 1 ? 1 : aspect) / (radius * 1.06);
       const camera = new Float32Array([
         fit / aspect, 0, 0, 0,
         0, fit, 0, 0,
-        0, 0, fit / 8, 0,
+        0, 0, -fit / 8, 0,
         0, 0, 0, 1,
       ]);
 

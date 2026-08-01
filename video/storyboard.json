@@ -1,0 +1,50 @@
+{
+  "meta": {
+    "title": "soundtag",
+    "voice": "nova",
+    "voiceInstructions": "Calm, precise, a maker showing you something they built. Not an advert.",
+    "fps": 30,
+    "formats": ["9x16", "1x1", "16x9"],
+    "holdSeconds": 0.55
+  },
+  "scenes": [
+    {
+      "id": "hook",
+      "kind": "title",
+      "narration": "A song you send someone is a link in a chat. It is gone by the time they scroll past it.",
+      "headline": "soundtag",
+      "sub": "a song, as an object"
+    },
+    {
+      "id": "paste",
+      "kind": "browser",
+      "narration": "Paste a Spotify link and the code becomes a thing you can turn, at the size it will print.",
+      "footage": "footage/paste.webm"
+    },
+    {
+      "id": "change",
+      "kind": "browser",
+      "narration": "The plate stops at one height and the code starts exactly there. One filament change for the whole print, not one per layer.",
+      "footage": "footage/change.webm"
+    },
+    {
+      "id": "shapes",
+      "kind": "browser",
+      "narration": "Five shapes. Add a title and the tag grows to fit it, because the code is the point of the object.",
+      "footage": "footage/shapes.webm"
+    },
+    {
+      "id": "cli",
+      "kind": "cli",
+      "narration": "The same build on the command line, and it tells you which layer to swap on.",
+      "ansi": "footage/cli.ansi",
+      "cmd": "npx soundtag \"https://open.spotify.com/track/...\""
+    },
+    {
+      "id": "close",
+      "kind": "still",
+      "narration": "MIT, no upload, no account. Everything it claims was measured, and what was not is written down.",
+      "image": "footage/close.png"
+    }
+  ]
+}
