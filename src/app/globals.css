@@ -595,3 +595,43 @@ footer p {
   background: var(--accent);
   animation: caret 1.05s steps(1, end) infinite;
 }
+
+/* The offline path, folded away because most visitors never need it. */
+
+.offline {
+  margin-top: 1.1rem;
+  border-top: var(--rule);
+  padding-top: 0.9rem;
+}
+
+.offline summary {
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--mute);
+  list-style: none;
+}
+
+.offline summary::before {
+  content: "+ ";
+  color: var(--accent);
+}
+
+.offline[open] summary::before {
+  content: "- ";
+}
+
+.offline > * {
+  margin-top: 0.6rem;
+}
+
+textarea {
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  background: var(--panel-high);
+  border: 1px solid var(--edge);
+  color: var(--fog);
+  font: inherit;
+  font-size: 0.76rem;
+  border-radius: 2px;
+  resize: vertical;
+}

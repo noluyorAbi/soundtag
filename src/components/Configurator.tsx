@@ -19,8 +19,9 @@ import { motion, useReducedMotion } from "motion/react";
 
 import { DEMO_SCANNABLE, DEMO_TRACK } from "@/lib/demo";
 import { FILAMENTS, changePlan, pairing } from "@/lib/filament";
+import { BEDS } from "@/lib/export/threemf";
 import { SHAPES, layout, type ShapeName } from "@/lib/layouts";
-import { parseRef, type Scannable } from "@/lib/scannable";
+import { parseRef, parseScannable, type Scannable } from "@/lib/scannable";
 import { buildTag, composeTag, type TagOptions } from "@/lib/tag";
 import { LiveTag } from "./LiveTag";
 import { TagDrawing } from "./TagDrawing";
@@ -60,6 +61,8 @@ export function Configurator({ intro }: { intro?: React.ReactNode }) {
   const [isDemo, setIsDemo] = useState(true);
   const [settings, setSettings] = useState<Settings>(START);
   const [view, setView] = useState<"live" | "drawing">("live");
+  const [bed, setBed] = useState("bambu-a1");
+  const [pasted, setPasted] = useState("");
 
   const set = useCallback(<K extends keyof Settings>(key: K, value: Settings[K]) => {
     setSettings((current) => ({ ...current, [key]: value }));
@@ -149,8 +152,9 @@ export function Configurator({ intro }: { intro?: React.ReactNode }) {
     if (settings.artist) params.set("artist", settings.artist);
     params.set("body", settings.body);
     params.set("code", settings.code);
+    params.set("bed", bed);
     return params.toString();
-  }, [link, settings]);
+  }, [link, settings, bed]);
 
   return (
     <>
@@ -185,6 +189,38 @@ export function Configurator({ intro }: { intro?: React.ReactNode }) {
 
           {error ? <p className="error">{error}</p> : null}
           {composed.failure ? <p className="error">{composed.failure}</p> : null}
+
+          <details className="offline">
+            <summary>No connection, or Spotify said no</summary>
+            <p className="hint">
+              Paste the SVG of a Spotify Code and it is read here, in the browser. Nothing is
+              requested and nothing leaves the machine. The same file works with{" "}
+              <code>soundtag --from-svg</code>.
+            </p>
+            <textarea
+              value={pasted}
+              onChange={(event) => setPasted(event.target.value)}
+              placeholder="<svg ...> ... </svg>"
+              spellCheck={false}
+              rows={3}
+            />
+            <button
+              type="button"
+              className="ghost"
+              disabled={pasted.trim().length === 0}
+              onClick={() => {
+                try {
+                  setScannable(parseScannable(pasted));
+                  setIsDemo(false);
+                  setError(null);
+                } catch (cause) {
+                  setError(cause instanceof Error ? cause.message : String(cause));
+                }
+              }}
+            >
+              Read the pasted code
+            </button>
+          </details>
         </div>
 
         <motion.div
@@ -316,6 +352,21 @@ export function Configurator({ intro }: { intro?: React.ReactNode }) {
               value={settings.reliefMm}
               onChange={(event) => set("reliefMm", Number(event.target.value))}
             />
+          </label>
+
+          <label className="field-group">
+            <span className="label">Printer bed</span>
+            <select value={bed} onChange={(event) => setBed(event.target.value)}>
+              {Object.entries(BEDS).map(([id, plate]) => (
+                <option key={id} value={id}>
+                  {plate.name}, {plate.width} by {plate.depth} mm
+                </option>
+              ))}
+            </select>
+            <span className="hint">
+              Decides where the tag is placed on the plate, so it opens centred rather than in a
+              corner.
+            </span>
           </label>
 
           <label className="field-group">

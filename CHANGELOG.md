@@ -15,4 +15,6 @@ First release.
 - Filament contrast check and the exact change layer for a given layer height
 - A command line tool and a typed library entry, both from the same functions the site uses
 - A live view of the object, rendered from the same mesh the 3MF carries, written against WebGL rather than through a scene graph library
+- Works offline: paste a code image and it is parsed in the browser, no request and no Spotify
+- Bed selection in the browser as well as the CLI, so a tag opens centred on the plate it was built for
 - 92 tests, no geometry, ZIP, 3MF or CSS dependency

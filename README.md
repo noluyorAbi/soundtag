@@ -42,7 +42,9 @@ npx soundtag "https://open.spotify.com/track/2QjOHCTQ1Jl3zawyYOpxh6"
   the Spotify mark is not extruded. --mark adds it, see TRADEMARKS.md first.
 ```
 
-Or use [the site](https://soundtag.adatepe.dev/?utm_source=readme&utm_medium=try), which does the same thing with a drawing next to it.
+Or use [the site](https://soundtag.adatepe.dev/?utm_source=readme&utm_medium=try), which does the same thing with the object next to it, live and turnable.
+
+The site also works with no network and no Spotify at all: paste the SVG of a code you already have and it is read in the browser. Same parser, same geometry, same files. That path exists because the code endpoint is undocumented and not ours, and a tool that stops working when someone else's server changes is not finished.
 
 ## Shapes
 
@@ -107,6 +109,7 @@ const bytes = threeMf([singleTagPlacement(tag)]);
 
 | Setting | Value | Why |
 |---|---|---|
+| Printer bed | pick yours | Decides where the tag is placed, so it opens centred rather than in a corner |
 | Layer height | 0.2 mm | The default relief of 0.6 mm is exactly three layers |
 | Filament change | layer 13 | Printed by the slicer as the first layer of the code |
 | Supports | none | There is nothing overhanging |
