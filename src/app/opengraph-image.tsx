@@ -46,7 +46,6 @@ export default async function Image() {
         <div style={{ display: "flex", fontSize: 30, letterSpacing: 8, color: "#8f9bff" }}>
           SOUNDTAG
         </div>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={src} width={1056} height={226} alt="" />
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <div style={{ fontSize: 46, letterSpacing: -1 }}>A song, as an object.</div>

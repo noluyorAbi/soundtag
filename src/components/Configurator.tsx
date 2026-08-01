@@ -21,7 +21,8 @@ import { DEMO_SCANNABLE, DEMO_TRACK } from "@/lib/demo";
 import { FILAMENTS, changePlan, pairing } from "@/lib/filament";
 import { SHAPES, layout, type ShapeName } from "@/lib/layouts";
 import { parseRef, type Scannable } from "@/lib/scannable";
-import { composeTag, type TagOptions } from "@/lib/tag";
+import { buildTag, composeTag, type TagOptions } from "@/lib/tag";
+import { LiveTag } from "./LiveTag";
 import { TagDrawing } from "./TagDrawing";
 
 type Settings = {
@@ -58,6 +59,7 @@ export function Configurator({ intro }: { intro?: React.ReactNode }) {
   const [scannable, setScannable] = useState<Scannable>(DEMO_SCANNABLE);
   const [isDemo, setIsDemo] = useState(true);
   const [settings, setSettings] = useState<Settings>(START);
+  const [view, setView] = useState<"live" | "drawing">("live");
 
   const set = useCallback(<K extends keyof Settings>(key: K, value: Settings[K]) => {
     setSettings((current) => ({ ...current, [key]: value }));
@@ -117,6 +119,18 @@ export function Configurator({ intro }: { intro?: React.ReactNode }) {
   }, [scannable, options]);
 
   const geometry = composed.geometry;
+
+  // The mesh is only built for the live view, and only when the settings that
+  // change it change. A slider drag would otherwise rebuild a few thousand
+  // triangles on every frame.
+  const tag = useMemo(() => {
+    if (view !== "live") return null;
+    try {
+      return buildTag(scannable, options);
+    } catch {
+      return null;
+    }
+  }, [view, scannable, options]);
   const preset = layout(settings.shape);
   const pair = pairing(settings.body, settings.code);
   const change = geometry ? changePlan(geometry.changeZ, settings.layerHeightMm) : null;
@@ -179,8 +193,34 @@ export function Configurator({ intro }: { intro?: React.ReactNode }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1], delay: 0.12 }}
         >
+          <div className="view-switch">
+            <button
+              type="button"
+              className="chip"
+              aria-pressed={view === "live"}
+              onClick={() => setView("live")}
+            >
+              3D
+            </button>
+            <button
+              type="button"
+              className="chip"
+              aria-pressed={view === "drawing"}
+              onClick={() => setView("drawing")}
+            >
+              drawing
+            </button>
+          </div>
+
           <div className="panel-pad">
-            {geometry ? (
+            {view === "live" && tag ? (
+              <LiveTag
+                tag={tag}
+                bodyColour={settings.body}
+                codeColour={settings.code}
+                spin={!reduced}
+              />
+            ) : geometry ? (
               <TagDrawing
                 geometry={geometry}
                 bodyColour={settings.body}
@@ -188,6 +228,7 @@ export function Configurator({ intro }: { intro?: React.ReactNode }) {
               />
             ) : null}
           </div>
+          {view === "live" ? <span className="stage-hint">drag to turn it</span> : null}
           {geometry ? (
             <div className="readout">
               <span>

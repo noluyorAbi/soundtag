@@ -9,20 +9,23 @@
  */
 
 :root {
-  --void: #07080a;
-  --panel: #0d0f13;
-  --panel-high: #12151a;
+  /* The palette is monolith's, because these two are the same workshop and a
+     visitor should be able to tell. Every value carries its measured contrast
+     against --void, which is the rule that palette was built under. */
+  --void: #060708;
+  --panel: #0b0c0e;
+  --panel-high: #111316;
 
-  --fog: #eef1f4; /* 17.9:1  body */
-  --mute: #9aa3ad; /*  8.1:1  secondary copy */
-  --dim: #838d98; /*  6.0:1  small uppercase labels */
-  --edge: #59616b; /*  3.2:1  control boundaries */
-  --line: #1e232a; /*  1.4:1  decorative rules only */
+  --fog: #ecece9; /* 16.8:1  body */
+  --mute: #a3a7ad; /*  8.3:1  secondary copy, unselected controls */
+  --dim: #8b9096; /*  6.3:1  small uppercase labels */
+  --edge: #5f656c; /*  3.4:1  control boundaries */
+  --line: #2c3036; /*  1.5:1  decorative rules only */
 
-  --accent: #8f9bff; /*  8.4:1  anything you can act on */
-  --accent-dim: #4c58c8;
-  --accent-wash: rgba(143, 155, 255, 0.12);
-  --cut: #ff6b5e; /*  7.4:1  the laser cut line, and warnings */
+  --accent: #d7ff45; /* 17.6:1 anything you can act on */
+  --accent-dim: #8ba32c;
+  --accent-wash: rgba(215, 255, 69, 0.1);
+  --cut: #ff8367; /*  8.4:1  the laser cut line, and warnings */
 
   --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
@@ -31,6 +34,11 @@
   --rule: 1px solid var(--line);
 
   color-scheme: dark;
+}
+
+::selection {
+  background: var(--accent);
+  color: #000;
 }
 
 * {
@@ -59,7 +67,7 @@ body {
 
 /* A faint stipple, so pure black never reads as an unpainted canvas. */
 .field {
-  background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
+  background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.055) 1px, transparent 0);
   background-size: 22px 22px;
 }
 
@@ -270,7 +278,7 @@ button {
   letter-spacing: 0.01em;
   padding: 0.75rem 1.15rem;
   background: var(--accent);
-  color: #05060a;
+  color: #000;
   border: 1px solid var(--accent);
   border-radius: 2px;
   cursor: pointer;
@@ -278,8 +286,8 @@ button {
 }
 
 button:hover:not([disabled]) {
-  background: #b3bcff;
-  border-color: #b3bcff;
+  background: #e6ff7a;
+  border-color: #e6ff7a;
 }
 
 button.ghost {
@@ -526,4 +534,64 @@ footer p {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* The live object ---------------------------------------------------------- */
+
+.live-tag {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  cursor: grab;
+  touch-action: none;
+}
+
+.live-tag:active {
+  cursor: grabbing;
+}
+
+.view-switch {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  z-index: 2;
+  display: flex;
+  gap: 0.25rem;
+}
+
+.view-switch .chip {
+  background: color-mix(in srgb, var(--void) 70%, transparent);
+  backdrop-filter: blur(6px);
+}
+
+.stage-hint {
+  position: absolute;
+  left: 1.1rem;
+  top: 1.15rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dim);
+  pointer-events: none;
+}
+
+/* A caret, so the input reads as a place where something is typed. */
+@keyframes caret {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  55%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.caret {
+  display: inline-block;
+  width: 0.55em;
+  height: 1em;
+  vertical-align: -0.15em;
+  background: var(--accent);
+  animation: caret 1.05s steps(1, end) infinite;
 }
