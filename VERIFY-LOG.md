@@ -43,6 +43,24 @@ round trip kept facets_reversed="0"
 
 The slicer's own mesh statistics report `edges_fixed="0" degenerate_facets="0" facets_removed="0" facets_reversed="0" backwards_edges="0"` for both parts, which is the slicer saying it had nothing to repair.
 
+## The deployment, checked against the live origin
+
+`node ~/.claude/skills/domain/lib/verify.mjs soundtag.adatepe.dev --old soundtag-psi.vercel.app`, 01.08.2026.
+
+| Check | Result |
+|---|---|
+| DNS resolves | `cname.vercel-dns.com` |
+| Not behind the Cloudflare proxy | grey cloud, which is what Vercel needs to renew a certificate |
+| HTTPS answers | 200, served by Vercel |
+| `robots.txt` names this origin | `Host: https://soundtag.adatepe.dev` |
+| Sitemap names this origin | first `loc` matches |
+| `security.txt` canonical matches | matches |
+| The old origin does not compete | `soundtag-psi.vercel.app` redirects, 308 |
+
+The last row failed on the first run: two origins were serving the same pages, and which one is canonical was whichever a crawler saw first. That is what the redirect in `next.config.ts` is for.
+
+A 3MF was also downloaded from the live route and opened in the slicer, rather than only from a local build: `manifold = yes`, 75.6 by 16.2 by 3.0 mm.
+
 ## Three things that were believed and turned out to be false
 
 Each was believed, built, and then contradicted by the slicer.
