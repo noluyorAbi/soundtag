@@ -2,5 +2,5 @@
 Contact: https://github.com/noluyorAbi/soundtag/security/advisories/new
 Policy: https://github.com/noluyorAbi/soundtag/blob/main/SECURITY.md
 Preferred-Languages: en, de
-Canonical: https://soundtag.vercel.app/.well-known/security.txt
+Canonical: https://soundtag.adatepe.dev/.well-known/security.txt
 Expires: 2027-08-01T00:00:00.000Z

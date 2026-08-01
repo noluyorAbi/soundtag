@@ -4,7 +4,7 @@
 [![npm](https://img.shields.io/npm/v/soundtag)](https://www.npmjs.com/package/soundtag)
 [![licence](https://img.shields.io/badge/licence-MIT-blue)](LICENSE)
 
-**[soundtag-psi.vercel.app](https://soundtag-psi.vercel.app/?utm_source=readme&utm_medium=hero)**
+**[soundtag.adatepe.dev](https://soundtag.adatepe.dev/?utm_source=readme&utm_medium=hero)**
 
 <img src="https://raw.githubusercontent.com/noluyorAbi/soundtag/main/assets/preview.gif" alt="Pasting a Spotify link, turning the tag in 3D, and the filament change landing on one layer" width="100%">
 
@@ -42,7 +42,7 @@ npx soundtag "https://open.spotify.com/track/2QjOHCTQ1Jl3zawyYOpxh6"
   the Spotify mark is not extruded. --mark adds it, see TRADEMARKS.md first.
 ```
 
-Or use [the site](https://soundtag-psi.vercel.app/?utm_source=readme&utm_medium=try), which does the same thing with a drawing next to it.
+Or use [the site](https://soundtag.adatepe.dev/?utm_source=readme&utm_medium=try), which does the same thing with a drawing next to it.
 
 ## Shapes
 

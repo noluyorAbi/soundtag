@@ -62,7 +62,7 @@
     "postcss": "^8.5.25",
     "sharp": "^0.35.0"
   },
-  "homepage": "https://soundtag-psi.vercel.app",
+  "homepage": "https://soundtag.adatepe.dev",
   "bugs": {
     "url": "https://github.com/noluyorAbi/soundtag/issues"
   },
