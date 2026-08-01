@@ -19,6 +19,8 @@ const config = [
       "dist/**",
       "*.tsbuildinfo",
       "planning/**",
+      // Its own workspace, with its own config and its own dependencies.
+      "video/**",
     ],
   },
   ...coreWebVitals,
