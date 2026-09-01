@@ -40,7 +40,7 @@
     "prepack": "npm run build:cli && npm run build:lib"
   },
   "dependencies": {
-    "motion": "12.42.2",
+    "motion": "13.1.1",
     "next": "^16.2.11",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
@@ -53,9 +53,9 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "esbuild": "^0.28.1",
-    "eslint": "^9.39.5",
+    "eslint": "^10.9.1",
     "eslint-config-next": "^16.2.11",
-    "typescript": "^5.9.3",
+    "typescript": "^7.0.2",
     "vitest": "^4.1.10"
   },
   "overrides": {
